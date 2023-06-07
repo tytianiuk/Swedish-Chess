@@ -45,4 +45,28 @@ export default class Board {
     return this.cells[y][x];
   }
 
+  addFigure(){
+    this.directionPawn(COLORS.white);
+    const splitedPosition = START_CHESS_POSITION.position.split('/');
+    for(let y = 0; y < START_CHESS_POSITION.numberVerticals; y++){
+      for(let x = 0; x < START_CHESS_POSITION.numberHorizontals; x++) {
+        if(figureTypes[splitedPosition[y][x]] !== null) {
+          const figure = new Figure(figureTypes[splitedPosition[y][x]]);
+          this.cells[y][x].figure = this.createImageFigure(figure);
+          this.cells[y][x].free = false;
+        }
+      }
+    }
+  }
+
+  createImageFigure(figure){
+    const img = document.createElement('img');
+    img.classList.add('figure');
+    img.src = figure.src;
+    img.color = figure.color;
+    img.type = figure.type;
+    img.isFirstMove = true;
+    return img;
+  }
+
 }
