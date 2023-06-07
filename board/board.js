@@ -27,4 +27,22 @@ export default class Board {
     console.log(cells);
     return cells;
   }
+
+  clearBoard() {
+    for (const row of this.cells) {
+      for (const cell of row) {
+        cell.figure = 0;
+        cell.selected = null;
+        cell.selectedFigure = 0;
+        cell.free = true;
+        cell.checked = false;
+        this.moveQueue = COLORS.white;
+      }
+    }
+  }
+
+  getCell(y,x) {
+    return this.cells[y][x];
+  }
+
 }
