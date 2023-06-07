@@ -31,3 +31,17 @@ display: flex;
 align-items: center;
 justify-content: center;
 }
+
+.figure {
+  width: 70px;
+  height: 70px;
+  position: relative;
+}
+
+.checked-king {
+  background: #ef5d34ad;
+}
+
+.selected {
+  background: hsla(141, 85%, 57%);
+}
