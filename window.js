@@ -65,7 +65,11 @@ export default class Window {
 
   canMove(startCell, endCell) {
     const {dy ,dx} = this.getAbsoluteCoordinates(startCell, endCell);
-    return this.searchWay(startCell,endCell, dy, dx);
+    if (startCell.figure.type === figureTypes.p.type){
+      if (this.board.pawnMoves(startCell, endCell, dx)){
+       return true;
+      } 
+   } else return this.searchWay(startCell,endCell, dy, dx);
   }
 
   move(startCell, endCell) {

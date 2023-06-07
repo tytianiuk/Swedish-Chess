@@ -127,6 +127,19 @@ export default class Board {
     return false;
   }
 
+  pawnMoves(startCell, endCell, dx) {
+    const direction = this.directionForPawn[startCell.figure.color];
+    const isPawnMove = figureMoves['pawn'].move(startCell, endCell, direction, dx);
+    const isPawnDoubleMove = figureMoves['pawn'].doubleMove(startCell, endCell, direction, dx);
+    const isPawnBeat  = figureMoves['pawn'].beatMove(startCell, endCell, direction, dx);
+    if ((isPawnMove || isPawnDoubleMove) && endCell.free) return true;
+    if (isPawnBeat && this.isEnemyForPawn(endCell, startCell.figure.color)) return true;
+  }
+
+  isEnemyForPawn(cell, color){
+    return (cell.figure && cell.figure.color != color) ? true : false;
+  }
+
   isEnemyFigure(cell, color){
     return (cell.figure.color != color) ? true : false;
   }
