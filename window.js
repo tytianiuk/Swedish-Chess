@@ -85,6 +85,9 @@ export default class Window {
     startCell.figure = 0;
     startCell.free = true;
     endCell.free = false;
+    if(this.checkWin(this.board.moveQueue)) {
+      return false;
+    }
 
     this.selectedFigure.isFirstMove = false;
     this.isCheckedKing(this.board.moveQueue);
@@ -146,4 +149,50 @@ export default class Window {
     }
   }
 
+  createPanel(){
+    const container = document.querySelector('.container');
+    const panel = document.createElement('div');
+    const panelText = document.createElement('p');
+    const button = document.createElement('button');
+    button.addEventListener('click', () => {
+      panel.classList.add('hide');
+
+      this.board.clearBoard();
+      this.board.addFigure();
+      this.showBoard();
+    })
+
+    panel.classList.add('panel','hide');
+    panelText.classList.add('text');
+    button.classList.add('button-restart');
+    button.textContent = 'RESTART';
+
+    container.append(panel);
+    panel.append(panelText);
+    panel.append(button);
+  }
+
+  showPanel(text){
+    const panel = document.querySelector('.panel');
+    const panelText = document.querySelector('.text');
+
+    panel.classList.remove('hide');
+    panelText.textContent = `${text.toUpperCase()} WINS`;
+  }
+
+  checkWin(moveQueue) {
+    const kings = [];
+    for(const row of this.board.cells) {
+      for(const cell of row) {
+        if(cell.figure.type === figureTypes.k.type) {
+          kings.push(cell);
+        }
+      }
+    }
+
+    if(kings.length == 1) {
+      this.showPanel(moveQueue);
+      return true;
+    }
+  }
 } 

@@ -45,3 +45,47 @@ justify-content: center;
 .selected {
   background: hsla(141, 85%, 57%);
 }
+
+.panel {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 560px;
+  height: 560px;
+  
+  border: 10px solid #555555;
+  background-color: rgba(85, 85, 85, 0.5);
+}
+
+.text{
+  text-align: center;
+  font-size: 36px;
+  color: white;
+}
+
+.button-restart {
+  width: 240px;
+  height: 80px;
+
+  font-size: 36px;
+
+  color: #fffbfb;
+  background-color: rgb(105, 176, 110);
+
+  border-radius: 25px;
+  border: 5px solid #ffffff;
+}
+
+.button-restart:hover{
+  background-color: rgb(96, 143, 99);
+}
+
+.button-restart:active{
+  background-color: rgb(96, 123, 98);
+}
+
+.hide {
+  z-index: -1;
+}

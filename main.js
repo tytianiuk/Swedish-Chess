@@ -9,3 +9,4 @@ board.addFigure();
 
 const window = new Window(boardHtml, board);
 window.showBoard();
+window.createPanel();
