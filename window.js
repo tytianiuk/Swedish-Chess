@@ -1,20 +1,20 @@
-import { figureMoves } from "./figures/figureMoves.js";
-import { figureTypes } from "./figures/figureTypes.js";
+import { figureMoves } from './figures/figureMoves.js';
+import { figureTypes } from './figures/figureTypes.js';
 
 export default class Window {
-  constructor(object, board){
+  constructor(object, board) {
     this.object = object;
     this.board = board;
   }
 
-  showBoard(){
+  showBoard() {
     this.object.innerHTML = '';
     for (const row of this.board.cells) {
       const rowHTML = document.createElement('div');
       rowHTML.classList.add('row');
       for (const cell of row) {
         const cellHTML = this.createCellHtml(cell);
-        if(cell.figure) cellHTML.append(cell.figure);
+        if (cell.figure) cellHTML.append(cell.figure);
         rowHTML.append(cellHTML);
       }
       this.object.prepend(rowHTML);
@@ -23,14 +23,14 @@ export default class Window {
 
   createCellHtml(cell) {
     const cellHTML = document.createElement('div');
-    cellHTML.className = `col ${cell.color}`;
+    cellHTML.className = `col ${cell.color} ${cell.x} ${cell.y}`;
     if (this.selected === cell) cellHTML.classList.add('selected');
     if (cell.checked) cellHTML.classList.add('checked-king');
     cellHTML.addEventListener('click', () => {
       if (this.selected === cell) {
         this.selected = null;
-      } else if (this.selected && this.selected !== cell && this.selectedFigure && this.board.isEnemyFigure(cell, this.selectedFigure.color)){
-         if (this.board.moveQueue === this.selectedFigure.color && this.canMove(this.selected, cell, this.board.moveQueue)) {
+      } else if (this.selected && this.selected !== cell && this.selectedFigure && this.board.isEnemyFigure(cell, this.selectedFigure.color)) {
+        if (this.board.moveQueue === this.selectedFigure.color && this.canMove(this.selected, cell, this.board.moveQueue)) {
           this.move(this.selected, cell);
         }
         this.selected = null;
@@ -43,22 +43,27 @@ export default class Window {
     return cellHTML;
   }
 
-  createPanel(){
+  createPanel(text) {
     const container = document.querySelector('.container');
     const panel = document.createElement('div');
     const panelText = document.createElement('p');
     const button = document.createElement('button');
+
     button.addEventListener('click', () => {
       panel.classList.add('hide');
+      panelText.classList.add('hide');
+      button.classList.add('hide');
 
       this.board.clearBoard();
       this.board.addFigure();
       this.showBoard();
     })
 
-    panel.classList.add('panel','hide');
+    panel.classList.add('panel');
     panelText.classList.add('text');
     button.classList.add('button-restart');
+
+    panelText.textContent = `${text.toUpperCase()} WINS`;
     button.textContent = 'RESTART';
 
     container.append(panel);
@@ -66,30 +71,21 @@ export default class Window {
     panel.append(button);
   }
 
-  showPanel(text){
-    const panel = document.querySelector('.panel');
-    const panelText = document.querySelector('.text');
-
-    panel.classList.remove('hide');
-    panelText.textContent = `${text.toUpperCase()} WINS`;
-  }
-
   //move methods
 
   canMove(startCell, endCell) {
-    const {dy ,dx} = this.getAbsoluteCoordinates(startCell, endCell);
+    const { dy, dx } = this.getAbsoluteCoordinates(startCell, endCell);
     if (startCell.figure.type === figureTypes.k.type && dx === 2 && dy === 0) {
       const kingCell = this.getMyKingCell(startCell.figure.color);
-      return  this.board.kingCastleMove(startCell, endCell, kingCell);
+      return this.board.kingCastleMove(startCell, endCell, kingCell);
     } else if (startCell.figure.type === figureTypes.k.type && this.isUnderAtack(endCell, startCell.figure.color)) {
       return false;
-    } else 
-    if (startCell.figure.type === figureTypes.p.type){
-       if (this.board.pawnMoves(startCell, endCell, dx)){
+    } else if (startCell.figure.type === figureTypes.p.type) {
+      if (this.board.pawnMoves(startCell, endCell, dx)) {
         return true;
-       } 
+      }
     } else
-    return this.searchWay(startCell,endCell, dy, dx);
+      return this.searchWay(startCell, endCell, dy, dx);
   }
 
   move(startCell, endCell) {
@@ -98,7 +94,7 @@ export default class Window {
     startCell.figure = 0;
     startCell.free = true;
     endCell.free = false;
-    if(this.checkWin(this.board.moveQueue)) {
+    if (this.checkWin(this.board.moveQueue)) {
       return false;
     }
 
@@ -111,30 +107,30 @@ export default class Window {
   //check methods
 
   checkFigureMovies(startCell, endCell) {
-    const {dy ,dx} = this.getAbsoluteCoordinates(startCell, endCell);
+    const { dy, dx } = this.getAbsoluteCoordinates(startCell, endCell);
     if (startCell.figure.type === figureTypes.k.type && dx === 2 && dy === 0) {
       const kingCell = this.getMyKingCell(startCell.figure.color);
       return this.board.kingCastleMove(startCell, endCell, kingCell);
-    } else if (startCell.figure.type === figureTypes.p.type){
-       if (this.board.pawnBeatForKing(startCell, endCell, dx)){
+    } else if (startCell.figure.type === figureTypes.p.type) {
+      if (this.board.pawnBeatForKing(startCell, endCell, dx)) {
         return true;
-       }
+      }
     } else
-    return this.searchWay(startCell,endCell, dy, dx);
+      return this.searchWay(startCell, endCell, dy, dx);
   }
 
   checkWin(moveQueue) {
     const kings = [];
-    for(const row of this.board.cells) {
-      for(const cell of row) {
-        if(cell.figure.type === figureTypes.k.type) {
+    for (const row of this.board.cells) {
+      for (const cell of row) {
+        if (cell.figure.type === figureTypes.k.type) {
           kings.push(cell);
         }
       }
     }
 
-    if(kings.length == 1) {
-      this.showPanel(moveQueue);
+    if (kings.length == 1) {
+      this.createPanel(moveQueue);
       return true;
     }
 
@@ -142,25 +138,25 @@ export default class Window {
 
   //get methods
 
-  getMyKingCell(color){
-    for(const row of this.board.cells) {
-      for(const cell of row) {
-        if(cell.figure.type === figureTypes.k.type && cell.figure.color === color) return cell;
+  getMyKingCell(color) {
+    for (const row of this.board.cells) {
+      for (const cell of row) {
+        if (cell.figure.type === figureTypes.k.type && cell.figure.color === color) return cell;
       }
     }
   }
 
-  getAbsoluteCoordinates(startCell, endCell){
+  getAbsoluteCoordinates(startCell, endCell) {
     const dy = Math.abs(startCell.y - endCell.y);
     const dx = Math.abs(startCell.x - endCell.x);
-    return {dy, dx}
+    return { dy, dx }
   }
 
-  getCellsOfAttackingFigure(targetCell, color){
+  getCellsOfAttackingFigure(targetCell, color) {
     const cells = [];
-    for(const row of this.board.cells) {
-      for(const cell of row) {
-        if(cell.figure && this.checkFigureMovies(cell, targetCell) && cell.figure.color !== color) {
+    for (const row of this.board.cells) {
+      for (const cell of row) {
+        if (cell.figure && this.checkFigureMovies(cell, targetCell) && cell.figure.color !== color) {
           cells.push(cell);
         }
       }
@@ -169,31 +165,31 @@ export default class Window {
   }
 
   //another methods
-  
-  isCheckedKing(color){
+
+  isCheckedKing(color) {
     const kingCell = this.getMyKingCell(color);
     const attackingFigureCells = this.getCellsOfAttackingFigure(kingCell, color);
-    if(attackingFigureCells.length !== 0) {
+    if (attackingFigureCells.length !== 0) {
       kingCell.checked = true;
       return kingCell.checked;
     }
-  } 
+  }
 
-  isUnderAtack(targetCell, color){
-   if(this.getCellsOfAttackingFigure(targetCell, color).length !== 0) return true;
+  isUnderAtack(targetCell, color) {
+    if (this.getCellsOfAttackingFigure(targetCell, color).length !== 0) return true;
   }
 
   clearCheck() {
-    for(const row of this.board.cells) {
-      for(const cell of row) {
-        if(cell.checked) cell.checked = false;
+    for (const row of this.board.cells) {
+      for (const cell of row) {
+        if (cell.checked) cell.checked = false;
       }
     }
   }
 
-  searchWay(startCell,endCell, dy, dx) {
-    for (const moveType of figureMoves[startCell.figure.type]){
-      if (moveType(dy, dx)){
+  searchWay(startCell, endCell, dy, dx) {
+    for (const moveType of figureMoves[startCell.figure.type]) {
+      if (moveType(dy, dx)) {
         const emptyVertical = this.board.checkEmptyVertical(startCell, endCell);
         const emptyHorizontal = this.board.checkEmptyHorizontal(startCell, endCell);
         const emptyDiagonal = this.board.checkEmptyDiagonal(startCell, endCell);

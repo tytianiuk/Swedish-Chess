@@ -1,10 +1,10 @@
-import Cell from "./cell.js";
-import Figure from "../figures/figure.js";
+import Cell from './cell.js';
+import Figure from '../figures/figure.js';
 
-import { COLORS } from "../resource/colors.js";
-import { figureTypes } from "../figures/figureTypes.js";
-import { figureMoves } from "../figures/figureMoves.js";
-import { START_CHESS_POSITION } from "../resource/position.js";
+import { COLORS } from '../resource/colors.js';
+import { figureTypes } from '../figures/figureTypes.js';
+import { figureMoves } from '../figures/figureMoves.js';
+import { START_CHESS_POSITION } from '../resource/position.js';
 
 export default class Board {
   constructor(x, y) {
@@ -16,9 +16,9 @@ export default class Board {
   }
   createBoard() {
     const cells = [];
-    for(let y = 0; y < this.numberCellHeight; y++) {
+    for (let y = 0; y < this.numberCellHeight; y++) {
       const row = [];
-      for(let x = 0; x < this.numberCellWidth; x++){
+      for (let x = 0; x < this.numberCellWidth; x++) {
         row.push(new Cell(x, y, (x + y) % 2 === 0 ? COLORS.black : COLORS.white));
       }
       cells.push(row);
@@ -40,12 +40,12 @@ export default class Board {
     }
   }
 
-  addFigure(){
+  addFigure() {
     this.directionPawn(COLORS.white);
     const splitedPosition = START_CHESS_POSITION.position.split('/');
-    for(let y = 0; y < START_CHESS_POSITION.numberVerticals; y++){
-      for(let x = 0; x < START_CHESS_POSITION.numberHorizontals; x++) {
-        if(figureTypes[splitedPosition[y][x]] !== null) {
+    for (let y = 0; y < START_CHESS_POSITION.numberVerticals; y++) {
+      for (let x = 0; x < START_CHESS_POSITION.numberHorizontals; x++) {
+        if (figureTypes[splitedPosition[y][x]] !== null) {
           const figure = new Figure(figureTypes[splitedPosition[y][x]]);
           this.cells[y][x].figure = this.createImageFigure(figure);
           this.cells[y][x].free = false;
@@ -54,7 +54,7 @@ export default class Board {
     }
   }
 
-  createImageFigure(figure){
+  createImageFigure(figure) {
     const img = document.createElement('img');
     img.classList.add('figure');
     img.src = figure.src;
@@ -66,12 +66,12 @@ export default class Board {
 
   // methods check
 
-  checkEmptyVertical(startCell, endCell){
-    if(startCell === endCell || startCell.x !== endCell.x) return false;
+  checkEmptyVertical(startCell, endCell) {
+    if (startCell === endCell || startCell.x !== endCell.x) return false;
     const minY = Math.min(startCell.y, endCell.y);
     const maxY = Math.max(startCell.y, endCell.y);
-    
-    for( let y = minY + 1; y < maxY; y++){
+
+    for (let y = minY + 1; y < maxY; y++) {
       if (!(this.getCell(y, startCell.x).free)) {
         return false;
       }
@@ -79,12 +79,12 @@ export default class Board {
     return true;
   }
 
-  checkEmptyHorizontal(startCell, endCell){
-    if(startCell === endCell || startCell.y !== endCell.y) return false;
+  checkEmptyHorizontal(startCell, endCell) {
+    if (startCell === endCell || startCell.y !== endCell.y) return false;
     const minX = Math.min(startCell.x, endCell.x);
     const maxX = Math.max(startCell.x, endCell.x);
-    
-    for( let x = minX + 1; x < maxX; x++){
+
+    for (let x = minX + 1; x < maxX; x++) {
       if (!(this.getCell(startCell.y, x).free)) {
         return false;
       }
@@ -92,16 +92,16 @@ export default class Board {
     return true;
   }
 
-  checkEmptyDiagonal(startCell, endCell){
-    if(startCell === endCell) return false;
+  checkEmptyDiagonal(startCell, endCell) {
+    if (startCell === endCell) return false;
     const dy = Math.abs(startCell.y - endCell.y);
     const dx = Math.abs(startCell.x - endCell.x);
     const x = (endCell.x > startCell.x) ? 1 : -1;
     const y = (endCell.y > startCell.y) ? 1 : -1;
 
-    if(dy !== dx) return false;
+    if (dy !== dx) return false;
 
-    for( let i = 1; i < dx; i++){
+    for (let i = 1; i < dx; i++) {
       if (!(this.getCell(i * y + startCell.y, i * x + startCell.x).free)) {
         return false;
       }
@@ -109,12 +109,12 @@ export default class Board {
     return true;
   }
 
-  checkJumpKnight(startCell, endCell){
+  checkJumpKnight(startCell, endCell) {
     const dy = Math.abs(startCell.y - endCell.y);
     const dx = Math.abs(startCell.x - endCell.x);
 
-    for(const moveType of figureMoves[figureTypes.n.type]) {
-      if(moveType(dy, dx)) return true;
+    for (const moveType of figureMoves[figureTypes.n.type]) {
+      if (moveType(dy, dx)) return true;
     }
     return false;
   }
@@ -123,35 +123,35 @@ export default class Board {
 
   pawnMoves(startCell, endCell, dx) {
     const direction = this.directionForPawn[startCell.figure.color];
-    const isPawnMove = figureMoves['pawn'].move(startCell, endCell, direction, dx);
-    const isPawnDoubleMove = figureMoves['pawn'].doubleMove(startCell, endCell, direction, dx);
-    const isPawnBeat  = figureMoves['pawn'].beatMove(startCell, endCell, direction, dx);
+    const isPawnMove = figureMoves[figureTypes.p.type].move(startCell, endCell, direction, dx);
+    const isPawnDoubleMove = figureMoves[figureTypes.p.type].doubleMove(startCell, endCell, direction, dx);
+    const isPawnBeat = figureMoves[figureTypes.p.type].beatMove(startCell, endCell, direction, dx);
     if ((isPawnMove || isPawnDoubleMove) && endCell.free) return true;
     if (isPawnBeat && this.isEnemyForPawn(endCell, startCell.figure.color)) return true;
   }
 
   pawnBeatForKing(startCell, endCell, dx) {
     const direction = this.directionForPawn[startCell.figure.color];
-    const isPawnBeat  = figureMoves['pawn'].beatMove(startCell, endCell, direction, dx);
+    const isPawnBeat = figureMoves[figureTypes.p.type].beatMove(startCell, endCell, direction, dx);
     if (isPawnBeat) return true;
   }
 
-  kingCastleMove(startCell, endCell, kingCell){
+  kingCastleMove(startCell, endCell, kingCell) {
     const dx = startCell.x - endCell.x;
-    const newX = ( startCell.x + endCell.x ) / 2;
+    const newX = (startCell.x + endCell.x) / 2;
     const longRookCell = this.cells[kingCell.y][0];
     const shortRookCell = this.cells[kingCell.y][7];
     const newCellForRook = this.cells[kingCell.y][newX];
     const emptyHorizontal = this.checkEmptyHorizontal(startCell, endCell);
 
-    if(kingCell.figure.isFirstMove && emptyHorizontal) {
-      if(dx > 0 && longRookCell.figure.isFirstMove) {
+    if (kingCell.figure.isFirstMove && emptyHorizontal) {
+      if (dx > 0 && longRookCell.figure.isFirstMove) {
         return this.moveRookForCastle(longRookCell, newCellForRook);
-        
+
       } else if (shortRookCell.figure.isFirstMove) {
         return this.moveRookForCastle(shortRookCell, newCellForRook);
       }
-    } 
+    }
   }
   moveRookForCastle(startCell, endCell) {
     endCell.figure = startCell.figure;
@@ -161,7 +161,7 @@ export default class Board {
 
     return true;
   }
-  
+
   //another methods
 
   directionPawn(color) {
@@ -169,19 +169,19 @@ export default class Board {
     this.directionForPawn = { white, black: -white };
   }
 
-  getCell(y,x) {
+  getCell(y, x) {
     return this.cells[y][x];
   }
 
-  isEnemyFigure(cell, color){
+  isEnemyFigure(cell, color) {
     return (cell.figure.color != color) ? true : false;
   }
 
-  isEnemyForPawn(cell, color){
+  isEnemyForPawn(cell, color) {
     return (cell.figure && cell.figure.color != color) ? true : false;
   }
-  
-  changeMoveQueue(moveQueue){
+
+  changeMoveQueue(moveQueue) {
     return moveQueue = moveQueue === COLORS.white ? COLORS.black : COLORS.white;
   }
 
