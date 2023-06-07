@@ -80,13 +80,19 @@ export default class Window {
   }
 
   move(startCell, endCell) {
+    this.clearCheck();
     endCell.figure = startCell.figure;
     startCell.figure = 0;
     startCell.free = true;
     endCell.free = false;
+    if(this.checkWin(this.board.moveQueue)) {
+      return false;
+    }
 
     this.selectedFigure.isFirstMove = false;
+    this.isCheckedKing(this.board.moveQueue);
     this.board.moveQueue = this.board.changeMoveQueue(this.board.moveQueue);
+    this.isCheckedKing(this.board.moveQueue);
   }
 
   checkFigureMovies(startCell, endCell) {
