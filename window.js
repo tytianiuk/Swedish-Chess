@@ -43,25 +43,38 @@ export default class Window {
     return cellHTML;
   }
 
-  getAbsoluteCoordinates(startCell, endCell){
-    const dy = Math.abs(startCell.y - endCell.y);
-    const dx = Math.abs(startCell.x - endCell.x);
-    return {dy, dx}
+  createPanel(){
+    const container = document.querySelector('.container');
+    const panel = document.createElement('div');
+    const panelText = document.createElement('p');
+    const button = document.createElement('button');
+    button.addEventListener('click', () => {
+      panel.classList.add('hide');
+
+      this.board.clearBoard();
+      this.board.addFigure();
+      this.showBoard();
+    })
+
+    panel.classList.add('panel','hide');
+    panelText.classList.add('text');
+    button.classList.add('button-restart');
+    button.textContent = 'RESTART';
+
+    container.append(panel);
+    panel.append(panelText);
+    panel.append(button);
   }
 
-  searchWay(startCell,endCell, dy, dx) {
-    for (const moveType of figureMoves[startCell.figure.type]){
-      if (moveType(dy, dx)){
-        const emptyVertical = this.board.checkEmptyVertical(startCell, endCell);
-        const emptyHorizontal = this.board.checkEmptyHorizontal(startCell, endCell);
-        const emptyDiagonal = this.board.checkEmptyDiagonal(startCell, endCell);
-        const isJumpKnight = this.board.checkJumpKnight(startCell, endCell);
+  showPanel(text){
+    const panel = document.querySelector('.panel');
+    const panelText = document.querySelector('.text');
 
-        return emptyVertical && !dx || emptyHorizontal && !dy || emptyDiagonal && dx === dy || isJumpKnight;
-      }
-    }
-    return false;
+    panel.classList.remove('hide');
+    panelText.textContent = `${text.toUpperCase()} WINS`;
   }
+
+  //move methods
 
   canMove(startCell, endCell) {
     const {dy ,dx} = this.getAbsoluteCoordinates(startCell, endCell);
@@ -95,6 +108,8 @@ export default class Window {
     this.isCheckedKing(this.board.moveQueue);
   }
 
+  //check methods
+
   checkFigureMovies(startCell, endCell) {
     const {dy ,dx} = this.getAbsoluteCoordinates(startCell, endCell);
     if (startCell.figure.type === figureTypes.k.type && dx === 2 && dy === 0) {
@@ -108,12 +123,37 @@ export default class Window {
     return this.searchWay(startCell,endCell, dy, dx);
   }
 
+  checkWin(moveQueue) {
+    const kings = [];
+    for(const row of this.board.cells) {
+      for(const cell of row) {
+        if(cell.figure.type === figureTypes.k.type) {
+          kings.push(cell);
+        }
+      }
+    }
+
+    if(kings.length == 1) {
+      this.showPanel(moveQueue);
+      return true;
+    }
+
+  }
+
+  //get methods
+
   getMyKingCell(color){
     for(const row of this.board.cells) {
       for(const cell of row) {
         if(cell.figure.type === figureTypes.k.type && cell.figure.color === color) return cell;
       }
     }
+  }
+
+  getAbsoluteCoordinates(startCell, endCell){
+    const dy = Math.abs(startCell.y - endCell.y);
+    const dx = Math.abs(startCell.x - endCell.x);
+    return {dy, dx}
   }
 
   getCellsOfAttackingFigure(targetCell, color){
@@ -128,6 +168,8 @@ export default class Window {
     return cells;
   }
 
+  //another methods
+  
   isCheckedKing(color){
     const kingCell = this.getMyKingCell(color);
     const attackingFigureCells = this.getCellsOfAttackingFigure(kingCell, color);
@@ -149,50 +191,17 @@ export default class Window {
     }
   }
 
-  createPanel(){
-    const container = document.querySelector('.container');
-    const panel = document.createElement('div');
-    const panelText = document.createElement('p');
-    const button = document.createElement('button');
-    button.addEventListener('click', () => {
-      panel.classList.add('hide');
+  searchWay(startCell,endCell, dy, dx) {
+    for (const moveType of figureMoves[startCell.figure.type]){
+      if (moveType(dy, dx)){
+        const emptyVertical = this.board.checkEmptyVertical(startCell, endCell);
+        const emptyHorizontal = this.board.checkEmptyHorizontal(startCell, endCell);
+        const emptyDiagonal = this.board.checkEmptyDiagonal(startCell, endCell);
+        const isJumpKnight = this.board.checkJumpKnight(startCell, endCell);
 
-      this.board.clearBoard();
-      this.board.addFigure();
-      this.showBoard();
-    })
-
-    panel.classList.add('panel','hide');
-    panelText.classList.add('text');
-    button.classList.add('button-restart');
-    button.textContent = 'RESTART';
-
-    container.append(panel);
-    panel.append(panelText);
-    panel.append(button);
-  }
-
-  showPanel(text){
-    const panel = document.querySelector('.panel');
-    const panelText = document.querySelector('.text');
-
-    panel.classList.remove('hide');
-    panelText.textContent = `${text.toUpperCase()} WINS`;
-  }
-
-  checkWin(moveQueue) {
-    const kings = [];
-    for(const row of this.board.cells) {
-      for(const cell of row) {
-        if(cell.figure.type === figureTypes.k.type) {
-          kings.push(cell);
-        }
+        return emptyVertical && !dx || emptyHorizontal && !dy || emptyDiagonal && dx === dy || isJumpKnight;
       }
     }
-
-    if(kings.length == 1) {
-      this.showPanel(moveQueue);
-      return true;
-    }
+    return false;
   }
-} 
+}
