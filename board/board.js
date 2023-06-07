@@ -136,6 +136,33 @@ export default class Board {
     if (isPawnBeat && this.isEnemyForPawn(endCell, startCell.figure.color)) return true;
   }
 
+  kingCastleMove(startCell, endCell, kingCell){
+    const dx = startCell.x - endCell.x;
+    const newX = ( startCell.x + endCell.x ) / 2;
+    const longRookCell = this.cells[kingCell.y][0];
+    const shortRookCell = this.cells[kingCell.y][7];
+    const newCellForRook = this.cells[kingCell.y][newX];
+    const emptyHorizontal = this.checkEmptyHorizontal(startCell, endCell);
+
+    if(kingCell.figure.isFirstMove && emptyHorizontal) {
+      if(dx > 0 && longRookCell.figure.isFirstMove) {
+        return this.moveRookForCastle(longRookCell, newCellForRook);
+        
+      } else if (shortRookCell.figure.isFirstMove) {
+        return this.moveRookForCastle(shortRookCell, newCellForRook);
+      }
+    } 
+  }
+  
+  moveRookForCastle(startCell, endCell) {
+    endCell.figure = startCell.figure;
+    startCell.figure = 0;
+    startCell.free = true;
+    endCell.free = false;
+
+    return true;
+  }
+
   isEnemyForPawn(cell, color){
     return (cell.figure && cell.figure.color != color) ? true : false;
   }
