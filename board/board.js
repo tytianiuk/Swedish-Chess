@@ -129,9 +129,9 @@ export default class Board {
 
   pawnMoves(startCell, endCell, dx) {
     const direction = this.directionForPawn[startCell.figure.color];
-    const isPawnMove = figureMoves['pawn'].move(startCell, endCell, direction, dx);
-    const isPawnDoubleMove = figureMoves['pawn'].doubleMove(startCell, endCell, direction, dx);
-    const isPawnBeat  = figureMoves['pawn'].beatMove(startCell, endCell, direction, dx);
+    const isPawnMove = figureMoves[figureTypes.p.type].move(startCell, endCell, direction, dx);
+    const isPawnDoubleMove = figureMoves[figureTypes.p.type].doubleMove(startCell, endCell, direction, dx);
+    const isPawnBeat  = figureMoves[figureTypes.p.type].beatMove(startCell, endCell, direction, dx);
     if ((isPawnMove || isPawnDoubleMove) && endCell.free) return true;
     if (isPawnBeat && this.isEnemyForPawn(endCell, startCell.figure.color)) return true;
   }
