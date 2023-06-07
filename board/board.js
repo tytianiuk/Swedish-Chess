@@ -117,4 +117,22 @@ export default class Board {
     return true;
   }
 
+  checkJumpKnight(startCell, endCell){
+    const dy = Math.abs(startCell.y - endCell.y);
+    const dx = Math.abs(startCell.x - endCell.x);
+
+    for(const moveType of figureMoves[figureTypes.n.type]) {
+      if(moveType(dy, dx)) return true;
+    }
+    return false;
+  }
+
+  isEnemyFigure(cell, color){
+    return (cell.figure.color != color) ? true : false;
+  }
+
+  changeMoveQueue(moveQueue){
+    return moveQueue = moveQueue === COLORS.white ? COLORS.black : COLORS.white;
+  }
+
 }

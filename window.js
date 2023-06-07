@@ -55,6 +55,7 @@ export default class Window {
         const emptyVertical = this.board.checkEmptyVertical(startCell, endCell);
         const emptyHorizontal = this.board.checkEmptyHorizontal(startCell, endCell);
         const emptyDiagonal = this.board.checkEmptyDiagonal(startCell, endCell);
+        const isJumpKnight = this.board.checkJumpKnight(startCell, endCell);
 
         return emptyVertical && !dx || emptyHorizontal && !dy || emptyDiagonal && dx === dy || isJumpKnight;
       }
@@ -65,6 +66,16 @@ export default class Window {
   canMove(startCell, endCell) {
     const {dy ,dx} = this.getAbsoluteCoordinates(startCell, endCell);
     return this.searchWay(startCell,endCell, dy, dx);
+  }
+
+  move(startCell, endCell) {
+    endCell.figure = startCell.figure;
+    startCell.figure = 0;
+    startCell.free = true;
+    endCell.free = false;
+
+    this.selectedFigure.isFirstMove = false;
+    this.board.moveQueue = this.board.changeMoveQueue(this.board.moveQueue);
   }
 
 } 
