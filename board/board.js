@@ -136,6 +136,12 @@ export default class Board {
     if (isPawnBeat && this.isEnemyForPawn(endCell, startCell.figure.color)) return true;
   }
 
+  pawnBeatForKing(startCell, endCell, dx) {
+    const direction = this.directionForPawn[startCell.figure.color];
+    const isPawnBeat  = figureMoves['pawn'].beatMove(startCell, endCell, direction, dx);
+    if (isPawnBeat) return true;
+  }
+
   kingCastleMove(startCell, endCell, kingCell){
     const dx = startCell.x - endCell.x;
     const newX = ( startCell.x + endCell.x ) / 2;

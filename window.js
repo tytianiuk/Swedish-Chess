@@ -67,12 +67,16 @@ export default class Window {
     const {dy ,dx} = this.getAbsoluteCoordinates(startCell, endCell);
     if (startCell.figure.type === figureTypes.k.type && dx === 2 && dy === 0) {
       const kingCell = this.getMyKingCell(startCell.figure.color);
-      return this.board.kingCastleMove(startCell, endCell, kingCell);
-    } else if (startCell.figure.type === figureTypes.p.type){
-       if (this.board.pawnBeatForKing(startCell, endCell, dx)){
+      return  this.board.kingCastleMove(startCell, endCell, kingCell);
+    } else if (startCell.figure.type === figureTypes.k.type && this.isUnderAtack(endCell, startCell.figure.color)) {
+      return false;
+    } else 
+    if (startCell.figure.type === figureTypes.p.type){
+       if (this.board.pawnMoves(startCell, endCell, dx)){
         return true;
-       }
-    } else return this.searchWay(startCell,endCell, dy, dx);
+       } 
+    } else
+    return this.searchWay(startCell,endCell, dy, dx);
   }
 
   move(startCell, endCell) {
@@ -83,6 +87,60 @@ export default class Window {
 
     this.selectedFigure.isFirstMove = false;
     this.board.moveQueue = this.board.changeMoveQueue(this.board.moveQueue);
+  }
+
+  checkFigureMovies(startCell, endCell) {
+    const {dy ,dx} = this.getAbsoluteCoordinates(startCell, endCell);
+    if (startCell.figure.type === figureTypes.k.type && dx === 2 && dy === 0) {
+      const kingCell = this.getMyKingCell(startCell.figure.color);
+      return this.board.kingCastleMove(startCell, endCell, kingCell);
+    } else if (startCell.figure.type === figureTypes.p.type){
+       if (this.board.pawnBeatForKing(startCell, endCell, dx)){
+        return true;
+       }
+    } else
+    return this.searchWay(startCell,endCell, dy, dx);
+  }
+
+  getMyKingCell(color){
+    for(const row of this.board.cells) {
+      for(const cell of row) {
+        if(cell.figure.type === figureTypes.k.type && cell.figure.color === color) return cell;
+      }
+    }
+  }
+
+  getCellsOfAttackingFigure(targetCell, color){
+    const cells = [];
+    for(const row of this.board.cells) {
+      for(const cell of row) {
+        if(cell.figure && this.checkFigureMovies(cell, targetCell) && cell.figure.color !== color) {
+          cells.push(cell);
+        }
+      }
+    }
+    return cells;
+  }
+
+  isCheckedKing(color){
+    const kingCell = this.getMyKingCell(color);
+    const attackingFigureCells = this.getCellsOfAttackingFigure(kingCell, color);
+    if(attackingFigureCells.length !== 0) {
+      kingCell.checked = true;
+      return kingCell.checked;
+    }
+  } 
+
+  isUnderAtack(targetCell, color){
+   if(this.getCellsOfAttackingFigure(targetCell, color).length !== 0) return true;
+  }
+
+  clearCheck() {
+    for(const row of this.board.cells) {
+      for(const cell of row) {
+        if(cell.checked) cell.checked = false;
+      }
+    }
   }
 
 } 
