@@ -42,5 +42,29 @@ export default class Window {
     });
     return cellHTML;
   }
-  
+
+  getAbsoluteCoordinates(startCell, endCell){
+    const dy = Math.abs(startCell.y - endCell.y);
+    const dx = Math.abs(startCell.x - endCell.x);
+    return {dy, dx}
+  }
+
+  searchWay(startCell,endCell, dy, dx) {
+    for (const moveType of figureMoves[startCell.figure.type]){
+      if (moveType(dy, dx)){
+        const emptyVertical = this.board.checkEmptyVertical(startCell, endCell);
+        const emptyHorizontal = this.board.checkEmptyHorizontal(startCell, endCell);
+        const emptyDiagonal = this.board.checkEmptyDiagonal(startCell, endCell);
+
+        return emptyVertical && !dx || emptyHorizontal && !dy || emptyDiagonal && dx === dy || isJumpKnight;
+      }
+    }
+    return false;
+  }
+
+  canMove(startCell, endCell) {
+    const {dy ,dx} = this.getAbsoluteCoordinates(startCell, endCell);
+    return this.searchWay(startCell,endCell, dy, dx);
+  }
+
 } 
