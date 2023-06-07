@@ -1,4 +1,10 @@
+import Cell from './cell.js';
+import Figure from '../figures/figure.js';
+
 import { COLORS } from '../resource/colors.js';
+import { figureTypes } from '../figures/figureTypes.js';
+import { figureMoves } from '../figures/figureMoves.js';
+import { START_CHESS_POSITION } from '../resource/position.js';
 
 export default class Board {
   constructor(x, y) {
