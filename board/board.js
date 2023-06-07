@@ -1,10 +1,10 @@
-import Cell from './cell.js';
-import Figure from '../figures/figure.js';
+import Cell from "./cell.js";
+import Figure from "../figures/figure.js";
 
-import { COLORS } from '../resource/colors.js';
-import { figureTypes } from '../figures/figureTypes.js';
-import { figureMoves } from '../figures/figureMoves.js';
-import { START_CHESS_POSITION } from '../resource/position.js';
+import { COLORS } from "../colors.js";
+import { figureTypes } from "../figures/figureTypes.js";
+import { figureMoves } from "../figures/figureMoves.js";
+import { START_CHESS_POSITION } from "../position.js";
 
 export default class Board {
   constructor(x, y) {
@@ -14,7 +14,6 @@ export default class Board {
     this.directionForPawn = 1;
     this.moveQueue = COLORS.white;
   }
-
   createBoard() {
     const cells = [];
     for(let y = 0; y < this.numberCellHeight; y++) {
@@ -41,10 +40,6 @@ export default class Board {
     }
   }
 
-  getCell(y,x) {
-    return this.cells[y][x];
-  }
-
   addFigure(){
     this.directionPawn(COLORS.white);
     const splitedPosition = START_CHESS_POSITION.position.split('/');
@@ -69,10 +64,7 @@ export default class Board {
     return img;
   }
 
-  directionPawn(color) {
-    const white = color === COLORS.white ? 1 : -1;
-    this.directionForPawn = { white, black: -white };
-  }
+  // methods check
 
   checkEmptyVertical(startCell, endCell){
     if(startCell === endCell || startCell.x !== endCell.x) return false;
@@ -127,11 +119,13 @@ export default class Board {
     return false;
   }
 
+  // methods movies
+
   pawnMoves(startCell, endCell, dx) {
     const direction = this.directionForPawn[startCell.figure.color];
-    const isPawnMove = figureMoves[figureTypes.p.type].move(startCell, endCell, direction, dx);
-    const isPawnDoubleMove = figureMoves[figureTypes.p.type].doubleMove(startCell, endCell, direction, dx);
-    const isPawnBeat  = figureMoves[figureTypes.p.type].beatMove(startCell, endCell, direction, dx);
+    const isPawnMove = figureMoves['pawn'].move(startCell, endCell, direction, dx);
+    const isPawnDoubleMove = figureMoves['pawn'].doubleMove(startCell, endCell, direction, dx);
+    const isPawnBeat  = figureMoves['pawn'].beatMove(startCell, endCell, direction, dx);
     if ((isPawnMove || isPawnDoubleMove) && endCell.free) return true;
     if (isPawnBeat && this.isEnemyForPawn(endCell, startCell.figure.color)) return true;
   }
@@ -159,7 +153,6 @@ export default class Board {
       }
     } 
   }
-  
   moveRookForCastle(startCell, endCell) {
     endCell.figure = startCell.figure;
     startCell.figure = 0;
@@ -168,15 +161,26 @@ export default class Board {
 
     return true;
   }
+  
+  //another methods
 
-  isEnemyForPawn(cell, color){
-    return (cell.figure && cell.figure.color != color) ? true : false;
+  directionPawn(color) {
+    const white = color === COLORS.white ? 1 : -1;
+    this.directionForPawn = { white, black: -white };
+  }
+
+  getCell(y,x) {
+    return this.cells[y][x];
   }
 
   isEnemyFigure(cell, color){
     return (cell.figure.color != color) ? true : false;
   }
 
+  isEnemyForPawn(cell, color){
+    return (cell.figure && cell.figure.color != color) ? true : false;
+  }
+  
   changeMoveQueue(moveQueue){
     return moveQueue = moveQueue === COLORS.white ? COLORS.black : COLORS.white;
   }
