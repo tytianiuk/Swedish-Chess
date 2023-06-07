@@ -85,9 +85,6 @@ export default class Window {
     startCell.figure = 0;
     startCell.free = true;
     endCell.free = false;
-    if(this.checkWin(this.board.moveQueue)) {
-      return false;
-    }
 
     this.selectedFigure.isFirstMove = false;
     this.isCheckedKing(this.board.moveQueue);

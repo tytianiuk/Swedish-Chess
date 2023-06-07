@@ -1,4 +1,4 @@
-import { COLORS } from "../colors.js";
+import { COLORS } from "../resource/colors.js";
 
 export const figureTypes = {
   K: {
