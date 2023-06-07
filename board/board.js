@@ -69,4 +69,52 @@ export default class Board {
     return img;
   }
 
+  directionPawn(color) {
+    const white = color === COLORS.white ? 1 : -1;
+    this.directionForPawn = { white, black: -white };
+  }
+
+  checkEmptyVertical(startCell, endCell){
+    if(startCell === endCell || startCell.x !== endCell.x) return false;
+    const minY = Math.min(startCell.y, endCell.y);
+    const maxY = Math.max(startCell.y, endCell.y);
+    
+    for( let y = minY + 1; y < maxY; y++){
+      if (!(this.getCell(y, startCell.x).free)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  checkEmptyHorizontal(startCell, endCell){
+    if(startCell === endCell || startCell.y !== endCell.y) return false;
+    const minX = Math.min(startCell.x, endCell.x);
+    const maxX = Math.max(startCell.x, endCell.x);
+    
+    for( let x = minX + 1; x < maxX; x++){
+      if (!(this.getCell(startCell.y, x).free)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  checkEmptyDiagonal(startCell, endCell){
+    if(startCell === endCell) return false;
+    const dy = Math.abs(startCell.y - endCell.y);
+    const dx = Math.abs(startCell.x - endCell.x);
+    const x = (endCell.x > startCell.x) ? 1 : -1;
+    const y = (endCell.y > startCell.y) ? 1 : -1;
+
+    if(dy !== dx) return false;
+
+    for( let i = 1; i < dx; i++){
+      if (!(this.getCell(i * y + startCell.y, i * x + startCell.x).free)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
 }
